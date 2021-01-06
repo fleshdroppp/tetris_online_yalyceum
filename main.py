@@ -40,9 +40,9 @@ score = 0
 
 
 def check_pos():
-    if current_figure[cell].x < 0 or current_figure[cell].x > WIDTH - 1:
+    if current_figure[cell].x < 0 or current_figure[cell].x >= WIDTH:
         return False
-    elif current_figure[cell].y > HEIGHT - 1 or \
+    elif current_figure[cell].y >= HEIGHT or \
             board[current_figure[cell].y][current_figure[cell].x]:
         return False
     return True
@@ -96,13 +96,13 @@ while running:
     center = current_figure[0]
     old_figure = deepcopy(current_figure)
     if rotation:
-        for i in range(4):
-            x = current_figure[i].y - center.y
-            y = current_figure[i].x - center.x
-            current_figure[i].x = center.x - x
-            current_figure[i].y = center.y + y
+        for cell in range(4):
+            x = current_figure[cell].y - center.y
+            y = current_figure[cell].x - center.x
+            current_figure[cell].x = center.x - x
+            current_figure[cell].y = center.y + y
             if not check_pos():
-                figure = deepcopy(old_figure)
+                current_figure = deepcopy(old_figure)
                 break
 
     # ОЧИСТКА ЛИНИЙ, НАЧИСЛЕНИЕ ОЧКОВ, УСКОРЕНИЕ
