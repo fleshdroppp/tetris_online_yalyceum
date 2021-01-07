@@ -50,6 +50,9 @@ def check_pos():
 
 running = True
 while running:
+    # СПИСОК БЛОКОВ ДЛЯ ОТРИСОВКИ
+    blocks = list()
+
     win_screen.fill('black')
     win_screen.blit(screen, (20, 20))
     screen.fill('black')
@@ -119,27 +122,34 @@ while running:
             anim_speed += 5
             score += 1
 
-    # ОТРИСОВКА СЕТКИ
+    # ОТРИСОВКА СЕТКИ (ВСЕГДА ОДНА)
     [pygame.draw.rect(screen, (50, 50, 50), item, 1) for item in grid]
 
     # ОТРИСОВКА ПАДАЮЩЕЙ ФИГУРЫ
     for cell in range(4):
         figure_rect.x = current_figure[cell].x * CELL_SIZE
         figure_rect.y = current_figure[cell].y * CELL_SIZE
-        pygame.draw.rect(screen, color, figure_rect)
+        blocks.append([deepcopy(figure_rect), color, screen])
+        #pygame.draw.rect(screen, color, figure_rect)
 
     # ОТРИСОВКА СЛЕДУЮЩЕЙ ФИГУРЫ
     for cell in range(4):
         figure_rect.x = next_figure[cell].x * CELL_SIZE + 380
         figure_rect.y = next_figure[cell].y * CELL_SIZE + 185
-        pygame.draw.rect(win_screen, next_color, figure_rect)
+        blocks.append([deepcopy(figure_rect), next_color, win_screen])
+        #pygame.draw.rect(win_screen, next_color, figure_rect)
 
-    # ОТРИСОВКА ПОЛЯ
+    # ОБРАБОТКА ВСЕХ СТАТИЧНЫХ ФИГУР ПОЛЯ
     for y, row in enumerate(board):
         for x, col in enumerate(row):
             if col:
                 figure_rect.x, figure_rect.y = x * CELL_SIZE, y * CELL_SIZE
-                pygame.draw.rect(screen, col, figure_rect)
+                blocks.append([deepcopy(figure_rect), col, screen])
+                #pygame.draw.rect(screen, col, figure_rect)
+
+    # ОТРИСОВКА ПОЛЯ (ДЛЯ СЕРВЕРА)
+    for block in blocks:
+        pygame.draw.rect(block[2], block[1], block[0])
 
     # КОНЕЦ ИГРЫ
     for col in range(WIDTH):
