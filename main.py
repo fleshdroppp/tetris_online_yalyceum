@@ -1,5 +1,5 @@
 import pygame
-from random import randrange, choice
+from random import choice
 from copy import deepcopy
 
 WIDTH, HEIGHT = 10, 20
@@ -49,6 +49,7 @@ def check_pos():
 
 
 running = True
+figure_index = figures.index(current_figure)
 while running:
     # СПИСОК БЛОКОВ ДЛЯ ОТРИСОВКИ
     blocks = list()
@@ -81,6 +82,7 @@ while running:
 
     # ПЕРЕДВИЖЕНИЕ ПО ОСИ У
     anim_count += anim_speed
+    touched = 0
     if anim_count > anim_limit:
         anim_count = 0
         old_figure = deepcopy(current_figure)
@@ -92,21 +94,24 @@ while running:
                 current_figure, color = next_figure, next_color
                 next_figure = deepcopy(choice(figures))
                 next_color = colors[figures.index(next_figure)]
+                figure_index = figures.index(current_figure)
                 anim_limit = 2000
+                touched = 1
                 break
 
     # ПОВОРОТ ФИГУРЫ
-    center = current_figure[0]
-    old_figure = deepcopy(current_figure)
-    if rotation:
-        for cell in range(4):
-            x = current_figure[cell].y - center.y
-            y = current_figure[cell].x - center.x
-            current_figure[cell].x = center.x - x
-            current_figure[cell].y = center.y + y
-            if not check_pos():
-                current_figure = deepcopy(old_figure)
-                break
+    if figure_index != 1:
+        center = current_figure[0]
+        old_figure = deepcopy(current_figure)
+        if rotation:
+            for cell in range(4):
+                x = current_figure[cell].y - center.y
+                y = current_figure[cell].x - center.x
+                current_figure[cell].x = center.x - x
+                current_figure[cell].y = center.y + y
+                if not check_pos():
+                    current_figure = deepcopy(old_figure)
+                    break
 
     # ОЧИСТКА ЛИНИЙ, НАЧИСЛЕНИЕ ОЧКОВ, УСКОРЕНИЕ
     line = HEIGHT - 1
@@ -127,25 +132,31 @@ while running:
 
     # ОТРИСОВКА ПАДАЮЩЕЙ ФИГУРЫ
     for cell in range(4):
-        figure_rect.x = current_figure[cell].x * CELL_SIZE
-        figure_rect.y = current_figure[cell].y * CELL_SIZE
+        figure_rect.x = current_figure[cell].x * CELL_SIZE + 1
+        figure_rect.y = current_figure[cell].y * CELL_SIZE + 1
         blocks.append([deepcopy(figure_rect), color, screen])
-        #pygame.draw.rect(screen, color, figure_rect)
+        # pygame.draw.rect(screen, color, figure_rect)
 
     # ОТРИСОВКА СЛЕДУЮЩЕЙ ФИГУРЫ
+    font = pygame.font.Font(None, 60)
+    text = font.render("NEXT", True, (255, 255, 255))
+    win_screen.blit(text, (550, 150))
+    text = font.render("SCORE " + str(score), True, (255, 255, 255))
+    win_screen.blit(text, (525, 25))
+
     for cell in range(4):
-        figure_rect.x = next_figure[cell].x * CELL_SIZE + 380
-        figure_rect.y = next_figure[cell].y * CELL_SIZE + 185
+        figure_rect.x = next_figure[cell].x * CELL_SIZE + 380 + 1
+        figure_rect.y = next_figure[cell].y * CELL_SIZE + 180 + 20
         blocks.append([deepcopy(figure_rect), next_color, win_screen])
-        #pygame.draw.rect(win_screen, next_color, figure_rect)
+        # pygame.draw.rect(win_screen, next_color, figure_rect)
 
     # ОБРАБОТКА ВСЕХ СТАТИЧНЫХ ФИГУР ПОЛЯ
     for y, row in enumerate(board):
         for x, col in enumerate(row):
             if col:
-                figure_rect.x, figure_rect.y = x * CELL_SIZE, y * CELL_SIZE
+                figure_rect.x, figure_rect.y = x * CELL_SIZE + 1, y * CELL_SIZE + 1
                 blocks.append([deepcopy(figure_rect), col, screen])
-                #pygame.draw.rect(screen, col, figure_rect)
+                # pygame.draw.rect(screen, col, figure_rect)
 
     # ОТРИСОВКА ПОЛЯ (ДЛЯ СЕРВЕРА)
     for block in blocks:
@@ -161,5 +172,6 @@ while running:
                 pygame.draw.rect(screen, 'black', i_rect)
                 win_screen.blit(screen, (20, 20))
                 pygame.display.flip()
+            running = False  # ENF OF THE GAME
     pygame.display.flip()
     clock.tick(FPS)
