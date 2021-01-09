@@ -17,16 +17,14 @@ def send_blocks(data):
 
 
 def game():
-    WIDTH, HEIGHT = 10, 20
-    CELL_SIZE = 45
-    WINDOW_RESOLUTION = 750, 940
+    width, height = 10, 20
+    cell_size = 45
+    window_resolution = 750, 940
 
-    GAME_RESOLUTION = WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE
+    game_resolution = width * cell_size, height * cell_size
 
-    # win_screen = pygame.display.set_mode(WINDOW_RESOLUTION)
-    # screen = pygame.Surface(GAME_RESOLUTION)
-
-
+    # win_screen = pygame.display.set_mode(window_resolution)
+    # screen = pygame.Surface(game_resolution)
 
     pygame.init()
 
@@ -40,9 +38,9 @@ def game():
 
     anim_count, anim_speed, anim_limit = 0, 60, 2000
 
-    figures = [[pygame.Rect(x + WIDTH // 2, y + 1, 1, 1) for x, y in pos] for pos in figures_types]
-    figure_rect = pygame.Rect(0, 0, CELL_SIZE - 2, CELL_SIZE - 2)
-    board = [[0 for col in range(WIDTH)] for row in range(HEIGHT)]
+    figures = [[pygame.Rect(x + width // 2, y + 1, 1, 1) for x, y in pos] for pos in figures_types]
+    figure_rect = pygame.Rect(0, 0, cell_size - 2, cell_size - 2)
+    board = [[0 for col in range(width)] for row in range(height)]
 
     colors = ['#00ff00', '#ff0000', '#ffffff', '#ADD8E6', '#f7ca18', '#bf55ec', '#F08080']
     current_figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
@@ -50,9 +48,9 @@ def game():
     score = 0
 
     def check_pos():
-        if current_figure[cell].x < 0 or current_figure[cell].x >= WIDTH:
+        if current_figure[cell].x < 0 or current_figure[cell].x >= width:
             return False
-        elif current_figure[cell].y >= HEIGHT or \
+        elif current_figure[cell].y >= height or \
                 board[current_figure[cell].y][current_figure[cell].x]:
             return False
         return True
@@ -113,19 +111,43 @@ def game():
                     current_figure = deepcopy(old_figure)
                     break
 
+        # ОЧИСТКА ЛИНИЙ, НАЧИСЛЕНИЕ ОЧКОВ, УСКОРЕНИЕ
+        line = height - 1
+        for row in range(height - 1, -1, -1):
+            cnt_elements = 0
+            for col in range(width):
+                if board[row][col]:
+                    cnt_elements += 1
+                board[line][col] = board[row][col]
+            if cnt_elements < width:
+                line -= 1
+            else:
+                anim_speed += 5
+                score += 1
+
+        # ОТРИСОВКА ПАДАЮЩЕЙ ФИГУРЫ
         for cell in range(4):
-            figure_rect.x = current_figure[cell].x * CELL_SIZE + 1
-            figure_rect.y = current_figure[cell].y * CELL_SIZE + 1
+            figure_rect.x = current_figure[cell].x * cell_size + 1
+            figure_rect.y = current_figure[cell].y * cell_size + 1
             blocks.append([deepcopy(figure_rect), color, 1])
 
+        # ОБРАБОТКА ВСЕХ СТАТИЧНЫХ ФИГУР ПОЛЯ
         for y, row in enumerate(board):
             for x, col in enumerate(row):
                 if col:
-                    figure_rect.x, figure_rect.y = x * CELL_SIZE, y * CELL_SIZE
+                    figure_rect.x, figure_rect.y = x * cell_size, y * cell_size
                     blocks.append([deepcopy(figure_rect), col, 1])
 
         if event == 'ready':
             send_blocks(blocks)
+
+        # КОНЕЦ ИГРЫ
+        for col in range(width):
+            if board[0][col]:
+                board = [[0 for i in range(width)] for i in range(height)]
+                anim_count, anim_speed, anim_limit = 0, 60, 2000
+                score = 0
+                running = False  # ENF OF THE GAME
 
 
 if __name__ == "__main__":
