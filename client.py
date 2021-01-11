@@ -62,6 +62,7 @@ if __name__ == '__main__':
         while running:
             win_screen.fill('black')
             win_screen.blit(screen, (20, 20))
+            screen.fill('black')
 
             d_x, rotation = 0, False
             for event in pygame.event.get():
