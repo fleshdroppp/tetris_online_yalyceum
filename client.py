@@ -3,6 +3,7 @@ import pygame
 import json
 import pickle
 from main import solo_game
+from pygame import mixer
 
 running = True
 
@@ -52,12 +53,17 @@ if __name__ == '__main__':
         pygame.display.flip()
         clock.tick(FPS)
 
+    mixer.init()
+    mixer.music.load('data/music.mp3')
+    mixer.music.set_volume(0.2)
+    mixer.music.play(loops=0)
+
     if solo:
         win_screen.fill('black')
         solo_game()
     elif team:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(('127.0.0.1', 4006))
+        client.connect(('212.33.246.62', 3333))
 
         while running:
             win_screen.fill('black')
