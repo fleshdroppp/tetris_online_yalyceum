@@ -3,8 +3,6 @@ from json import decoder
 import requests
 import pygame
 
-running = True
-
 ADDRESS = "localhost:5000"
 
 WIDTH, HEIGHT = 10, 20
@@ -17,7 +15,7 @@ win_screen = pygame.display.set_mode(WINDOW_RESOLUTION)
 screen = pygame.Surface(GAME_RESOLUTION)
 clock = pygame.time.Clock()
 grid = [pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE) for x in range(WIDTH) for y in range(HEIGHT)]
-count_req = 0
+
 pygame.init()
 
 
@@ -28,7 +26,11 @@ def move(direction, user_id):
         exit('Unable to send player\'s command')
 
 
-if __name__ == '__main__':
+def coop_game():
+    count_req = 0
+
+    running = True
+    # if __name__ == '__main__':
     user_id = requests.get(f'http://{ADDRESS}/new_user').json()['id']
 
     while running:
@@ -42,6 +44,9 @@ if __name__ == '__main__':
         try:
             blocks = requests.get(f'http://{ADDRESS}/move/send/{user_id}').json()
             # Need to draw score
+            font = pygame.font.Font('../data/ARCADECLASSIC.TTF', 60)
+            text = font.render("SCORE " + str(blocks['score']), True, (255, 255, 255))
+            win_screen.blit(text, (525, 25))
             # print(blocks['score'])
         except decoder.JSONDecodeError:
             exit('Unable to get data from server. May it be down?')
