@@ -41,8 +41,14 @@ if __name__ == '__main__':
         blocks = {}
         try:
             blocks = requests.get(f'http://{ADDRESS}/move/send/{user_id}').json()
+            # Need to draw score
+            # print(blocks['score'])
         except decoder.JSONDecodeError:
             exit('Unable to get data from server. May it be down?')
+
+        # Drawing next figure
+        # for block in blocks['next_figure']:
+        #     print(block)
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:

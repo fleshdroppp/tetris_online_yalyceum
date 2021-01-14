@@ -11,10 +11,6 @@ def create_app():
     app = Flask(__name__)
 
     # Spawn game thread
-    while not game_data['ready_to_start']:
-        # Waiting for second player
-        continue
-
     job = Thread(target=game)
     job.start()
 
@@ -27,6 +23,6 @@ def create_app():
 
 if __name__ == '__main__':
     main_app = create_app()
-    # main_app.run(debug=False)
+    main_app.run(debug=False)
     # choose your ip and port
-    main_app.run(host="0.0.0.0", port=3333)
+    # main_app.run(host="0.0.0.0", port=3333)

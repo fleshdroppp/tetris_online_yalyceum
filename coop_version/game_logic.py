@@ -12,7 +12,8 @@ game_data = {
     'running': True,
     'ready_to_start': False,
     'turn': 0,
-    'score': 0
+    'score': 0,
+    'next_figure': []
 }
 
 
@@ -41,8 +42,9 @@ def game():
     board = [[0 for col in range(width)] for row in range(height)]
     colors = ['#00ff00', '#ff0000', '#ffffff', '#ADD8E6', '#f7ca18', '#bf55ec', '#F08080']
     current_figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
+    # for square in next_figure:
+    #     game_data['next_figure'].append([square.x, square.y])
     color, next_color = colors[figures.index(current_figure)], colors[figures.index(next_figure)]
-    score = 0
     clock = pygame.time.Clock()
 
     logging.debug('Game initialized')
@@ -147,6 +149,6 @@ def game():
             if board[0][col]:
                 board = [[0 for i in range(width)] for i in range(height)]
                 anim_count, anim_speed, anim_limit = 0, 60, 2000
-                score = 0
-                running = False
+                game_data['score'] = 0
+                game_data['running'] = False
         clock.tick(60)
